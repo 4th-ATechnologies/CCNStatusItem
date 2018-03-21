@@ -15,6 +15,7 @@
 @property (weak) IBOutlet NSButton *disableCheckbox;
 @property (weak) IBOutlet NSButton *proximityDetectionCheckbox;
 @property (weak) IBOutlet NSButton *dragAndDropCheckbox;
+@property (weak) IBOutlet NSButton *extendedDragAndDropCheckbox;
 @property (weak) IBOutlet NSButton *pinPopoverCheckbox;
 @property (weak) IBOutlet NSSlider *proximityDragZoneDistanceSlider;
 @property (weak) IBOutlet NSTextField *currentpProximityDragZoneDistanceTextField;
@@ -139,6 +140,11 @@
 - (IBAction)dragAndDropCheckboxAction:(NSButton *)dragAndDropCheckbox {
     CCNStatusItem *sharedItem = [CCNStatusItem sharedInstance];
     if (dragAndDropCheckbox.state == NSOnState) {
+
+        self.extendedDragAndDropCheckbox.state = NSOffState;
+        sharedItem.extendedDropHandler  = nil;
+
+        sharedItem.dropTypes = @[NSFilenamesPboardType];
         sharedItem.dropHandler = ^(CCNStatusItem *sharedItem, NSString *pasteboardType, NSArray *droppedObjects) {
             NSAlert *alert = [[NSAlert alloc] init];
             alert.messageText = @"Dropped Objects";
@@ -153,6 +159,60 @@
     else {
         sharedItem.dropHandler = nil;
     }
+}
+
+- (IBAction)extendedDragAndDropCheckboxAction:(NSButton *)extendedDragAndDropCheckbox {
+    CCNStatusItem *sharedItem = [CCNStatusItem sharedInstance];
+    if (extendedDragAndDropCheckbox.state == NSOnState) {
+
+        self.dragAndDropCheckbox.state = NSOffState;
+        sharedItem.dropHandler = nil;
+        sharedItem.dropTypes = @[NSFilenamesPboardType,
+                                     NSURLPboardType,
+                                     NSTIFFPboardType,
+                                     (NSString *)kUTTypeImage,
+                                     (NSString *)kUTTypeVCard
+                                     ];
+
+        sharedItem.extendedDropHandler = ^BOOL(CCNStatusItem *sharedItem, NSArray<NSPasteboardItem *> *pasteboardItems) {
+            BOOL didAcceptDrop = YES;
+
+            NSUInteger itemNumber = 0;
+            __block NSMutableString *objectInfo = [NSMutableString new];
+
+            for (NSPasteboardItem *oneItem in pasteboardItems)
+            {
+
+                [objectInfo appendFormat:@"%@.", @(itemNumber++)];
+                NSArray<NSPasteboardType> *types =  oneItem.types;
+
+                [types enumerateObjectsUsingBlock:^(NSString *type, NSUInteger idx, BOOL *stop) {
+                    [objectInfo appendFormat:@"\t%@\n", type];
+                }];
+
+                [objectInfo appendFormat:@"\n"];
+            }
+
+            NSTimeInterval delayInSeconds = .5;
+            dispatch_time_t delay = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
+            dispatch_after(delay, dispatch_get_main_queue(), ^{
+
+                 NSAlert *alert = [[NSAlert alloc] init];
+                alert.messageText = @"Dropped Objects";
+                alert.informativeText = objectInfo;
+                [alert runModal];
+            });
+
+            return didAcceptDrop;
+        };
+
+     }
+    else
+    {
+        sharedItem.extendedDropHandler  = nil;
+
+    }
+
 }
 
 - (IBAction)pinPopoverCheckboxAction:(NSButton *)pinPopoverCheckbox {

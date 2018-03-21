@@ -43,6 +43,8 @@ typedef NS_ENUM(NSInteger, CCNStatusItemProximityDragStatus) {
     CCNProximityDragStatusExited
 };
 
+
+typedef BOOL (^CCNStatusItemExtendedDropHandler)(CCNStatusItem *sharedItem, NSArray<NSPasteboardItem *> *pasteboardItems);
 typedef void (^CCNStatusItemDropHandler)(CCNStatusItem *sharedItem, NSString *pasteboardType, NSArray *droppedObjects);
 typedef void (^CCNStatusItemProximityDragDetectionHandler)(CCNStatusItem *sharedItem, NSPoint eventLocation, CCNStatusItemProximityDragStatus proxymityDragStatus);
 typedef BOOL (^CCNStatusItemShouldShowHandler)(CCNStatusItem *sharedItem);
@@ -84,6 +86,8 @@ typedef BOOL (^CCNStatusItemShouldShowHandler)(CCNStatusItem *sharedItem);
  */
 - (void)presentStatusItemWithImage:(NSImage *)itemImage contentViewController:(NSViewController *)contentViewController dropHandler:(CCNStatusItemDropHandler)dropHandler;
 
+- (void)presentStatusItemWithImage:(NSImage *)itemImage contentViewController:(NSViewController *)contentViewController extendedDropHandler:(CCNStatusItemExtendedDropHandler)extendedDropHandler;
+
 /**
  Presents the shared `CCNStatusItem` object with the given custom view and contentViewController for the popover window.
 
@@ -100,6 +104,8 @@ typedef BOOL (^CCNStatusItemShouldShowHandler)(CCNStatusItem *sharedItem);
  @param dropHandler           A handler to be called when a drop occurs on the status bar item.
  */
 - (void)presentStatusItemWithView:(NSView *)itemView contentViewController:(NSViewController *)contentViewController dropHandler:(CCNStatusItemDropHandler)dropHandler;
+
+- (void)presentStatusItemWithView:(NSView *)itemView contentViewController:(NSViewController *)contentViewController    extendedDropHandler:(CCNStatusItemExtendedDropHandler)extendedDropHandler;
 
 /**
  Update the contentViewController for the popover window.
@@ -122,6 +128,11 @@ typedef BOOL (^CCNStatusItemShouldShowHandler)(CCNStatusItem *sharedItem);
  Property that represents the dropHandler to be executed if not nil.
  */
 @property (copy, nonatomic) CCNStatusItemDropHandler dropHandler;
+
+/**
+ Property that represents the Extended dropHandler( which passes the pasteboard items) to be executed if not nil.
+ */
+@property (copy, nonatomic) CCNStatusItemExtendedDropHandler extendedDropHandler;
 
 /**
  Property that represents the shouldShowHandler to be executed when the status item is clicked, if not nil.

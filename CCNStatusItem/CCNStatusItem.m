@@ -161,6 +161,7 @@ static NSString *const CCNStatusItemWindowConfigurationPinnedPath = @"windowConf
 
         self.dropTypes = @[NSFilenamesPboardType];
         self.dropHandler = nil;
+        self.extendedDropHandler = nil;
         self.proximityDragDetectionEnabled = NO;
         self.proximityDragZoneDistance = 23.0;
         self.proximityDragDetectionHandler = nil;
@@ -188,6 +189,7 @@ static NSString *const CCNStatusItemWindowConfigurationPinnedPath = @"windowConf
     _statusItemWindowController = nil;
     _windowConfiguration = nil;
     _dropHandler = nil;
+    _extendedDropHandler = nil;
     _proximityDragDetectionHandler = nil;
     _proximityDragCollisionArea = nil;
     _customViewContainer = nil;
@@ -232,7 +234,7 @@ static NSString *const CCNStatusItemWindowConfigurationPinnedPath = @"windowConf
     [self.dropView removeFromSuperview];
     self.dropView = nil;
 
-    if (!self.dropHandler) {
+    if (! (self.dropHandler || self.extendedDropHandler)) {
         return;
     };
 
@@ -243,6 +245,7 @@ static NSString *const CCNStatusItemWindowConfigurationPinnedPath = @"windowConf
     self.dropView.statusItem = self;
     self.dropView.dropTypes = self.dropTypes;
     self.dropView.dropHandler = self.dropHandler;
+    self.dropView.extendedDropHandler = self.extendedDropHandler;
     [button addSubview:self.dropView];
     self.dropView.autoresizingMask = (NSViewWidthSizable | NSViewHeightSizable);
 }
@@ -259,7 +262,22 @@ static NSString *const CCNStatusItemWindowConfigurationPinnedPath = @"windowConf
     [self configureWithImage:itemImage];
     [self configureProximityDragCollisionArea];
 
+    self.extendedDropHandler = nil;
     self.dropHandler = dropHandler;
+    self.presentationMode = CCNStatusItemPresentationModeImage;
+    self.statusItemWindowController = [[CCNStatusItemWindowController alloc] initWithConnectedStatusItem:self
+                                                                                   contentViewController:contentViewController
+                                                                                     windowConfiguration:self.windowConfiguration];
+}
+
+- (void)presentStatusItemWithImage:(NSImage *)itemImage contentViewController:(NSViewController *)contentViewController extendedDropHandler:(CCNStatusItemExtendedDropHandler)extendedDropHandler {
+    if (self.presentationMode != CCNStatusItemPresentationModeUndefined) return;
+
+    [self configureWithImage:itemImage];
+    [self configureProximityDragCollisionArea];
+
+    self.extendedDropHandler = extendedDropHandler;
+    self.dropHandler = nil;
     self.presentationMode = CCNStatusItemPresentationModeImage;
     self.statusItemWindowController = [[CCNStatusItemWindowController alloc] initWithConnectedStatusItem:self
                                                                                    contentViewController:contentViewController
@@ -276,12 +294,28 @@ static NSString *const CCNStatusItemWindowConfigurationPinnedPath = @"windowConf
     [self configureWithView:itemView];
     [self configureProximityDragCollisionArea];
 
+    self.extendedDropHandler = nil;
     self.dropHandler = dropHandler;
     self.presentationMode = CCNStatusItemPresentationModeCustomView;
     self.statusItemWindowController = [[CCNStatusItemWindowController alloc] initWithConnectedStatusItem:self
                                                                                    contentViewController:contentViewController
                                                                                      windowConfiguration:self.windowConfiguration];
 }
+
+- (void)presentStatusItemWithView:(NSView *)itemView contentViewController:(NSViewController *)contentViewController extendedDropHandler:(CCNStatusItemExtendedDropHandler)extendedDropHandler {
+    if (self.presentationMode != CCNStatusItemPresentationModeUndefined) return;
+
+    [self configureWithView:itemView];
+    [self configureProximityDragCollisionArea];
+
+    self.extendedDropHandler = extendedDropHandler;
+    self.dropHandler = nil;
+    self.presentationMode = CCNStatusItemPresentationModeCustomView;
+    self.statusItemWindowController = [[CCNStatusItemWindowController alloc] initWithConnectedStatusItem:self
+                                                                                   contentViewController:contentViewController
+                                                                                     windowConfiguration:self.windowConfiguration];
+}
+
 
 - (void)updateContentViewController:(NSViewController *)contentViewController {
     [self.statusItemWindowController updateContenetViewController:contentViewController];
@@ -366,6 +400,10 @@ static NSString *const CCNStatusItemWindowConfigurationPinnedPath = @"windowConf
 
 - (void)setDropHandler:(CCNStatusItemDropHandler)dropHandler {
     _dropHandler = [dropHandler copy];
+    [self configureDropView];
+}
+- (void)setExtendedDropHandler:(CCNStatusItemExtendedDropHandler)extendedDropHandler{
+    _extendedDropHandler = [extendedDropHandler copy];
     [self configureDropView];
 }
 

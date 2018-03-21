@@ -70,17 +70,27 @@
 
 - (BOOL)performDragOperation:(id <NSDraggingInfo>)sender {
     NSPasteboard *pboard = [sender draggingPasteboard];
-    NSString *type = [self dropTypeInPasteboardTypes:pboard.types];
 
-    if (type) {
-        NSArray *items = [pboard propertyListForType:type];
-        if (self.dropHandler) {
-            self.dropHandler(self.statusItem, type, items);
-            return YES;
-        }
+    if(self.extendedDropHandler)
+    {
+        BOOL didAcceptDrop  = self.extendedDropHandler(self.statusItem, pboard.pasteboardItems);
+        return didAcceptDrop;
     }
-    return NO;
-}
+    else
+    {
+        NSString *type = [self dropTypeInPasteboardTypes:pboard.types];
+
+        if (type) {
+            NSArray *items = [pboard propertyListForType:type];
+            if (self.dropHandler) {
+                self.dropHandler(self.statusItem, type, items);
+                return YES;
+            }
+        }
+        return NO;
+
+    }
+  }
 
 @end
 
