@@ -471,7 +471,8 @@ static NSString *const CCNStatusItemWindowConfigurationPinnedPath = @"windowConf
             [self disableDragEventMonitor];
         }
         else {
-            [self dismissStatusItemWindow];
+// dont hide the window when resetting windowConfiguration.pinned , require it be done explicitly.
+//            [self dismissStatusItemWindow];
             if (self.proximityDragDetectionEnabled) {
                 [self enableDragEventMonitor];
             }
