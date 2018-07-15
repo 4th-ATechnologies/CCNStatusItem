@@ -95,8 +95,8 @@ static NSString *const CCNStatusItemWindowConfigurationPinnedPath = @"windowConf
 }
 
 - (void)mouseDown:(NSEvent *)theEvent {
-    _highlighted = YES;
-    [self setNeedsDisplay:YES];
+
+	[self highlightMenu:YES];
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Warc-performSelector-leaks"
@@ -106,10 +106,11 @@ static NSString *const CCNStatusItemWindowConfigurationPinnedPath = @"windowConf
 #pragma clang diagnostic pop
 }
 
-- (void)mouseUp:(NSEvent *)theEvent {
-    _highlighted = NO;
+-(void) highlightMenu:(BOOL)shouldHilight
+{
+	_highlighted = shouldHilight;
     [self setNeedsDisplay:YES];
-    [super mouseUp:theEvent];
+
 }
 
 @end
@@ -469,6 +470,13 @@ static NSString *const CCNStatusItemWindowConfigurationPinnedPath = @"windowConf
 - (void)dismissStatusItemWindow {
     [self.statusItemWindowController dismissStatusItemWindow];
 }
+
+/* private callback from windowController */
+-(void) statusItemWindowWasDismissed
+{
+	[ _customViewContainer highlightMenu:NO];
+}
+
 
 #pragma mark - KVO
 
