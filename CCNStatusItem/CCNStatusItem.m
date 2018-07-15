@@ -464,6 +464,7 @@ static NSString *const CCNStatusItemWindowConfigurationPinnedPath = @"windowConf
 #pragma mark - Handling the Status Item Window
 
 - (void)showStatusItemWindow {
+	[ _customViewContainer highlightMenu:YES];
     [self.statusItemWindowController showStatusItemWindow];
 }
 
