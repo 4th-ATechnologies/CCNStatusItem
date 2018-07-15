@@ -116,6 +116,8 @@ typedef void (^CCNStatusItemWindowAnimationCompletion)(void);
 - (void)dismissStatusItemWindow {
     if (self.animationIsRunning) return;
 
+	[self.statusItemView statusItemWindowWasDismissed];
+
     [self animateWindow:(CCNStatusItemWindow *) self.window withFadeDirection:CCNFadeDirectionFadeOut];
 }
 

@@ -54,6 +54,9 @@ static NSString *const CCNStatusItemWindowConfigurationPinnedPath = @"windowConf
 }
 @property (weak) id target;
 @property SEL action;
+
+-(void) highlightMenu:(BOOL)shouldHilight;
+
 @end
 
 @implementation CCNStatusItemContainerView
@@ -79,9 +82,16 @@ static NSString *const CCNStatusItemWindowConfigurationPinnedPath = @"windowConf
 }
 
 - (void)drawRect:(NSRect)dirtyRect {
-    NSBezierPath *bgPath = [NSBezierPath bezierPathWithRect:self.bounds];
-    [(_highlighted ? _backgroundHighlightColor : _backgroundDefaultColor) setFill];
-    [bgPath fill];
+
+	NSColor* color =  _highlighted ? _backgroundHighlightColor : _backgroundDefaultColor;
+	[color set];
+	[NSBezierPath fillRect:_frame];
+
+
+//    NSBezierPath *bgPath = [NSBezierPath bezierPathWithRect:self.bounds];
+//    [(_highlighted ? _backgroundHighlightColor : _backgroundDefaultColor) setFill];
+//    [bgPath fill];
+
 }
 
 - (void)mouseDown:(NSEvent *)theEvent {

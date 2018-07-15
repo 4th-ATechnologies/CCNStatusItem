@@ -208,6 +208,10 @@ typedef BOOL (^CCNStatusItemShouldShowHandler)(CCNStatusItem *sharedItem);
  */
 @property (strong, nonatomic) CCNStatusItemWindowConfiguration *windowConfiguration;
 
+/* private callback from windowController */
+-(void) statusItemWindowWasDismissed;
+
+
 @end
 
 
