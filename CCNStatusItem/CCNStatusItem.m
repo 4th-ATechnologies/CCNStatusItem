@@ -96,8 +96,6 @@ static NSString *const CCNStatusItemWindowConfigurationPinnedPath = @"windowConf
 
 - (void)mouseDown:(NSEvent *)theEvent {
 
-	[self highlightMenu:YES];
-
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Warc-performSelector-leaks"
     if (self.target && self.action) {
@@ -110,7 +108,6 @@ static NSString *const CCNStatusItemWindowConfigurationPinnedPath = @"windowConf
 {
 	_highlighted = shouldHilight;
     [self setNeedsDisplay:YES];
-
 }
 
 @end
@@ -173,6 +170,7 @@ static NSString *const CCNStatusItemWindowConfigurationPinnedPath = @"windowConf
         self.dropTypes = @[NSFilenamesPboardType];
         self.dropHandler = nil;
         self.extendedDropHandler = nil;
+		self.menuSelectHandler = nil;
         self.proximityDragDetectionEnabled = NO;
         self.proximityDragZoneDistance = 23.0;
         self.proximityDragDetectionHandler = nil;
@@ -201,6 +199,7 @@ static NSString *const CCNStatusItemWindowConfigurationPinnedPath = @"windowConf
     _windowConfiguration = nil;
     _dropHandler = nil;
     _extendedDropHandler = nil;
+	_menuSelectHandler = nil;
     _proximityDragDetectionHandler = nil;
     _proximityDragCollisionArea = nil;
     _customViewContainer = nil;
@@ -418,6 +417,12 @@ static NSString *const CCNStatusItemWindowConfigurationPinnedPath = @"windowConf
     [self configureDropView];
 }
 
+-(void) setMenuSelectHandler:(CCNStatusItemMenuSelectHandler)menuSelectHandler
+{
+	_menuSelectHandler = [menuSelectHandler copy];
+
+}
+
 #pragma mark - Helper
 
 - (void)enableDragEventMonitor {
@@ -464,6 +469,9 @@ static NSString *const CCNStatusItemWindowConfigurationPinnedPath = @"windowConf
 #pragma mark - Handling the Status Item Window
 
 - (void)showStatusItemWindow {
+	if(self.menuSelectHandler)
+		self.menuSelectHandler(self, YES);
+
 	[ _customViewContainer highlightMenu:YES];
     [self.statusItemWindowController showStatusItemWindow];
 }
@@ -475,6 +483,9 @@ static NSString *const CCNStatusItemWindowConfigurationPinnedPath = @"windowConf
 /* private callback from windowController */
 -(void) statusItemWindowWasDismissed
 {
+	if(self.menuSelectHandler)
+		self.menuSelectHandler(self, NO);
+
 	[ _customViewContainer highlightMenu:NO];
 }
 

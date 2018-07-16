@@ -49,6 +49,8 @@ typedef void (^CCNStatusItemDropHandler)(CCNStatusItem *sharedItem, NSString *pa
 typedef void (^CCNStatusItemProximityDragDetectionHandler)(CCNStatusItem *sharedItem, NSPoint eventLocation, CCNStatusItemProximityDragStatus proxymityDragStatus);
 typedef BOOL (^CCNStatusItemShouldShowHandler)(CCNStatusItem *sharedItem);
 
+typedef void (^CCNStatusItemMenuSelectHandler)(CCNStatusItem *sharedItem, BOOL isHighlighted);
+
 
 #pragma mark - CCNStatusItem
 
@@ -133,6 +135,12 @@ typedef BOOL (^CCNStatusItemShouldShowHandler)(CCNStatusItem *sharedItem);
  Property that represents the Extended dropHandler( which passes the pasteboard items) to be executed if not nil.
  */
 @property (copy, nonatomic) CCNStatusItemExtendedDropHandler extendedDropHandler;
+
+/**
+Property that represents the Menu Select handler  to be executed if not nil.
+*/
+@property (copy, nonatomic) CCNStatusItemMenuSelectHandler menuSelectHandler;
+
 
 /**
  Property that represents the shouldShowHandler to be executed when the status item is clicked, if not nil.
